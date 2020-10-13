@@ -44,4 +44,5 @@ def negative_mask_loss(base_loss: torch.Tensor, score: torch.Tensor, thresh: flo
 
 
 if __name__ == '__main__':
-    ohem_number()
+    # ohem_number()
+    pass
