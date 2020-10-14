@@ -142,7 +142,8 @@ class SynthTextDataset(Dataset):
         if self.transform:
             image, regscore, afscore, mask = self.transform(
                 image, regscore, afscore, mask)
-        return image, regscore, afscore, mask
+#         return image, regscore, afscore, mask
+        return image, regscore, afscore
         # return image, regscore, afscore, mask, np.array(wbbox), np.array(cbbox), np.array(afboxes)
 
     def _run_check(self, idx):

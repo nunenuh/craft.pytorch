@@ -57,9 +57,9 @@ def _custom_loader(path, mode='train', batch_size=16, shuffle=True, nworkers=4,
                          gauss_ksize=gksize, gauss_dratio=gdratio,
                          gauss_use_pad=guse_pad, gauss_pad_factor=gpad_factor)
 
-    dset_safe = nc.SafeDataset(dset)
+    dset = nc.SafeDataset(dset)
 
-    loader = DataLoader(dset_safe, batch_size=batch_size, shuffle=shuffle,
+    loader = DataLoader(dset, batch_size=batch_size, shuffle=shuffle,
                         num_workers=nworkers, drop_last=True)
 
     return loader
@@ -102,9 +102,9 @@ def _synthtext_loader(path, mode='train', batch_size=16, shuffle=True, nworkers=
                             gauss_ksize=gksize, gauss_dratio=gdratio,
                             gauss_use_pad=guse_pad, gauss_pad_factor=gpad_factor)
 
-    dset_safe = nc.SafeDataset(dset)
+    dset = nc.SafeDataset(dset)
 
-    loader = DataLoader(dset_safe, batch_size=batch_size, shuffle=shuffle,
+    loader = DataLoader(dset, batch_size=batch_size, shuffle=shuffle,
                         num_workers=nworkers, drop_last=True)
 
     return loader

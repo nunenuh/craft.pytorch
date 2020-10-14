@@ -27,7 +27,7 @@ def _isotropic_gaussian_heatmap(dratio: float = 3.0, ksize: tuple = (50,50), to_
 
 def _perspective_transform(image: np.ndarray, box):
     h, w = image.shape[0], image.shape[1]
-    dx, dy = box_utils.box_delta_xy(box)
+    dx, dy = box_utils.delta_xy(box)
     src_pts = np.array([[0, 0], [w, 0], [w, h], [0, h]], dtype="float32")
     dst_pts = np.array([[0, 0], [dx, 0], [dx, dy], [0, dy]], dtype="float32")
     M = cv.getPerspectiveTransform(src_pts, dst_pts)
@@ -50,17 +50,18 @@ class GaussianGenerator(object):
         image = np.zeros(image_size)
         g2dheatmap = self.gaussian2d.copy()
         for box in boxes:
-            box = box_utils.box_order(box, use_pad=self.use_pad, pad_factor=self.pad_factor)
-            xmin, ymin, xmax, ymax = box_utils.box_bounds(box)
+            box = box_utils.order(box, use_pad=self.use_pad, pad_factor=self.pad_factor)
+            xmin, ymin, xmax, ymax = box_utils.bounds(box)
 
             if xmin <= 0: xmin, xmax = abs(xmin), xmax + abs(xmin)
             if ymin <= 0: ymin, ymax = abs(ymin), ymax + abs(ymin)
 
             warped = _perspective_transform(g2dheatmap, box)
+#             print(warped.shape)
             cropped = image[ymin:ymax, xmin:xmax]
             ch, cw = cropped.shape
             nsize = (cw, ch)
-            warped = cv.resize(warped, nsize)
+            warped = cv.resize(warped, nsize, interpolation=cv.INTER_AREA)
             image[ymin:ymax, xmin:xmax] = np.add(warped, cropped)
 
         return image

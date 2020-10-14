@@ -398,10 +398,12 @@ class RandomHue(object):
 
 class NumpyToTensor(object):
     def __call__(self, img: np.ndarray, char: np.ndarray, aff: np.ndarray, mask: np.ndarray = None):
+        img, char, aff, = np.array(img), np.array(char), np.array(aff)
         img = F.to_tensor(img)
         char = F.to_tensor(char)
         aff = F.to_tensor(aff)
         if not (mask is None):
+            mask = np.array(mask)
             mask = F.to_tensor(mask)
             return img, char, aff, mask
         else:

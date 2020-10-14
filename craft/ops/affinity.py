@@ -3,17 +3,17 @@ from typing import *
 
 import numpy as np
 from shapely.geometry import Polygon
-from . import boxes
+from . import boxes as boxez
 
 
 def _affine_box(fbox: List[tuple], sbox: List[tuple], use_pad: bool = False, pad_factor: float = 0.2):
-    fbox_tct, fbox_tcb = boxes.center_triangle_top_bottom(fbox)
-    sbox_tct, sbox_tcb = boxes.center_triangle_top_bottom(sbox)
+    fbox_tct, fbox_tcb = boxez.center_triangle_top_bottom(fbox)
+    sbox_tct, sbox_tcb = boxez.center_triangle_top_bottom(sbox)
 
     tl, tr = fbox_tct, sbox_tct
     br, bl = sbox_tcb, fbox_tcb
     afbox = [tl, tr, br, bl]
-    afbox = boxes.order(afbox, use_pad=use_pad, pad_factor=pad_factor)
+    afbox = boxez.order(afbox, use_pad=use_pad, pad_factor=pad_factor)
     return afbox
 
 
@@ -29,7 +29,7 @@ def _affine_boxes(boxez: List[List], use_pad: bool = False, pad_factor: float = 
 
 
 def _is_box_intersect(boxa: List, boxb: List, threshold: float = 0.1):
-    iou_result = boxes.iou(boxa, boxb)
+    iou_result = boxez.iou(boxa, boxb)
     if iou_result > threshold:
         # print(iou_result)
         return True

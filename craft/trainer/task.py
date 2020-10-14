@@ -36,19 +36,19 @@ class TaskCRAFT(LightningModule):
 
     def training_step(self, batch, batch_idx):
         loss = self.shared_step(batch, batch_idx)
-        result = pl.TrainResult(loss)
-        result.log_dict({'trn_loss': loss})
+#         result = pl.TrainResult(loss)
+#         result.log_dict({'trn_loss': loss})
         self.log('trn_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
-        return result
+        return loss
 
     def validation_step(self, batch, batch_idx):
         loss = self.shared_step(batch, batch_idx)
-        result = pl.EvalResult(checkpoint_on=loss)
-        result.log_dict({'val_loss': loss})
+#         result = pl.EvalResult(checkpoint_on=loss)
+#         result.log_dict({'val_loss': loss})
         self.log('val_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
-        return result
+        return loss
 
     def configure_optimizers(self):
         if self.scheduler:

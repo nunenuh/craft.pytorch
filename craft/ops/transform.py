@@ -8,7 +8,7 @@ from skimage import io
 from skimage.filters import threshold_local
 from skimage.transform import rotate
 
-from craft_iqra.utils import box_utils
+# from craft_iqra.utils import box_utils
 
 
 def order_points(pts):

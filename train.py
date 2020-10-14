@@ -37,8 +37,12 @@ if __name__ == '__main__':
                         help='choose to shuffle data or not, default value is True')
     parser.add_argument('--num_workers', default=8, type=int,
                         help='how many workers to load for running dataset')
+    
     parser.add_argument('--dataset_path', required=True, default='/data/synthtext', type=str,
                         help='path to synthtext dataset')
+    parser.add_argument('--dataset_type', required=True, default='synthtext', type=str,
+                        help='fill with synthtext or custom')
+    
     parser.add_argument('--image_size', default='224x224', type=str,
                         help='witdh and height of the image, default value is 224x224')
     parser.add_argument('--num_gpus', default=1, type=int,
@@ -46,7 +50,7 @@ if __name__ == '__main__':
     parser.add_argument('--log_freq', default=10, type=int,
                         help='show log every value, default value is 10')
 
-    parser.add_argument('--checkpoint_dir', default='saved_checkpoints/', type=str,
+    parser.add_argument('--checkpoint_dir', default='checkpoints/', type=str,
                         help='checkpoint directory for saving progress')
     parser.add_argument('--logs_dir', default='logs/', type=str,
                         help='directory logs for tensorboard callback')
@@ -58,6 +62,8 @@ if __name__ == '__main__':
 
     # hyper parameter
     ROOT_PATH = args.dataset_path
+    DATA_TYPE = args.dataset_type
+    
     IMSIZE = (w, h)
     BSIZE = args.bsize
     SHUFFLE = args.shuffle
@@ -104,14 +110,22 @@ if __name__ == '__main__':
     
     
     
+    if DATA_TYPE == 'synthtext':
+        # trailoader and validloader
+        trainloader = loader.synthtext_trainloader(path=ROOT_PATH, batch_size=BSIZE,
+                                                   shuffle=SHUFFLE, nworkers=NWORKERS)
 
-    # trailoader and validloader
-    trainloader = loader.synthtext_trainloader(path=ROOT_PATH, batch_size=BSIZE,
-                                               shuffle=SHUFFLE, nworkers=NWORKERS)
-
-    validloader = loader.synthtext_validloader(path=ROOT_PATH, batch_size=BSIZE,
-                                               shuffle=False, nworkers=NWORKERS)
-    
+        validloader = loader.synthtext_validloader(path=ROOT_PATH, batch_size=BSIZE,
+                                                   shuffle=False, nworkers=NWORKERS)
+    elif DATA_TYPE == 'custom':
+        trainloader = loader.custom_trainloader(path=ROOT_PATH, batch_size=BSIZE,
+                                                shuffle=SHUFFLE, nworkers=NWORKERS)
+        
+        validloader = loader.custom_trainloader(path=ROOT_PATH, batch_size=BSIZE,
+                                                shuffle=False, nworkers=NWORKERS)
+    else:
+        raise NotImplemented(f'Only synthtext and custom type dataset are supported, '
+                             f'for other type is not supported yet!')
     
     # Model Preparation
     if WEIGHT_RESUME:
