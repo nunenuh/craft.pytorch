@@ -12,7 +12,7 @@ from torch.utils.data import Dataset
 # from craft_iqra import utils
 from typing import *
 
-from ..ops import boxes, affine, synthtext
+from ..ops import boxes, affinity, synthtext
 from ..ops.gaussian import GaussianGenerator
 from . import utils
 
@@ -118,7 +118,7 @@ class CustomDataset(Dataset):
 
     def _get_affinity_score_image(self, image: np.ndarray, charbb: List, wordbb: List):
         h, w = image.shape[0], image.shape[1]
-        affinity_boxes = affine.boxes(wordbb, charbb, threshold=self.aff_threshold)
+        affinity_boxes = affinity.boxes(wordbb, charbb, threshold=self.aff_threshold)
         afscore = self.gaussian(affinity_boxes, image_size=(h, w))
         return afscore, torch.from_numpy(np.array(affinity_boxes))
 

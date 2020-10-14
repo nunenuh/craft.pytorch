@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from . import function as FC
+from . import functional as FC
 from pandas._libs import reduction
 from typing import *
 
@@ -21,7 +21,8 @@ class MSEOHEMLoss(nn.Module):
         k_factor = 3
         k = sum_positive * k_factor
         num_all = predicted_image.shape[1]
-        if k + sum_positive > num_all: k = int(num_all - sum_positive)
+        if k + sum_positive > num_all:
+            k = int(num_all - sum_positive)
         if k < 10:
             avg_loss = mse_loss.mean()
         else:
@@ -43,13 +44,16 @@ class MSEOHEMLoss(nn.Module):
         batch_size, height, width, channels = predicted_images.shape
         predict = predicted_images.permute(3, 0, 1, 2)
 
-        pred_char = predict[0].contiguous().view([batch_size * height * width, 1])
+        pred_char = predict[0].contiguous().view(
+            [batch_size * height * width, 1])
         pred_aff = predict[1].contiguous().view(batch_size * height * width, 1)
         char_gt = char_gt.view([batch_size * height * width, 1])
         aff_gt = aff_gt.view([batch_size * height * width, 1])
 
-        loss_char = self.forward_once(pred_char.cpu().float(), char_gt.cpu().float())
-        loss_aff = self.forward_once(pred_aff.cpu().float(), aff_gt.cpu().float())
+        loss_char = self.forward_once(
+            pred_char.cpu().float(), char_gt.cpu().float())
+        loss_aff = self.forward_once(
+            pred_aff.cpu().float(), aff_gt.cpu().float())
         loss = loss_char + loss_aff
         return loss
 
@@ -68,7 +72,8 @@ class Maploss(nn.Module):
         for i in range(batch_size):
             average_number: int = 0
             # loss = torch.mean(pre_loss.view(-1)) * 0
-            positive_pixel: int = len(pre_loss[i][(loss_label[i] >= 0.1)])  # type: Any
+            positive_pixel: int = len(
+                pre_loss[i][(loss_label[i] >= 0.1)])  # type: Any
             average_number += positive_pixel
             if positive_pixel != 0:
                 posi_loss = torch.mean(pre_loss[i][(loss_label[i] >= 0.1)])
@@ -77,7 +82,8 @@ class Maploss(nn.Module):
                     nega_loss = torch.mean(pre_loss[i][(loss_label[i] < 0.1)])
                     average_number += len(pre_loss[i][(loss_label[i] < 0.1)])
                 else:
-                    nega_loss = torch.mean(torch.topk(pre_loss[i][(loss_label[i] < 0.1)], 3 * positive_pixel)[0])
+                    nega_loss = torch.mean(torch.topk(
+                        pre_loss[i][(loss_label[i] < 0.1)], 3 * positive_pixel)[0])
                     average_number += 3 * positive_pixel
                 sum_loss += nega_loss
             else:
@@ -104,8 +110,6 @@ class Maploss(nn.Module):
         char_loss = self.single_image_loss(loss_g, gh_label)
         affi_loss = self.single_image_loss(loss_a, gah_label)
         return char_loss / loss_g.shape[0] + affi_loss / loss_a.shape[0]
-
-
 
 
 class MSE_OHEM_Loss(nn.Module):
@@ -157,8 +161,10 @@ class OHEMLoss(nn.Module):
             target_flat = targets[i].view(1, -1)
             base_loss = self.loss_fn(predict_flat, target_flat.float())
 
-            positive_loss, num_positive = FC.positive_mask_loss(base_loss, target_flat, thresh=0)
-            negative_loss, num_negative = FC.negative_mask_loss(base_loss, target_flat, thresh=0)
+            positive_loss, num_positive = FC.positive_mask_loss(
+                base_loss, target_flat, thresh=0)
+            negative_loss, num_negative = FC.negative_mask_loss(
+                base_loss, target_flat, thresh=0)
             num_all = target_flat.size(0)
 
             k = num_positive * self.k_ratio
@@ -174,7 +180,8 @@ class OHEMLoss(nn.Module):
         return torch.stack(average_loss, 0).mean()
 
     def forward(self, predicts, region_label, affinity_label):
-        region_score, affinity_score = predicts[:, :, :, 0], predicts[:, :, :, 1]
+        region_score, affinity_score = predicts[:,
+                                                :, :, 0], predicts[:, :, :, 1]
         region_loss = self.forward_once(region_score, region_label)
         affinity_loss = self.forward_once(affinity_score, affinity_label)
         combined_loss = region_loss + affinity_loss

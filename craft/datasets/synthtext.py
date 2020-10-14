@@ -7,7 +7,7 @@ from shapely.geometry import Polygon
 import torch
 from torch.utils.data import Dataset, DataLoader, Sampler
 
-from ..ops import affinity
+from ..ops import boxes, affinity
 from ..ops.gaussian import GaussianGenerator
 from . import utils
 
