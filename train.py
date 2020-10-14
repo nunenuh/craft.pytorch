@@ -35,7 +35,7 @@ if __name__ == '__main__':
                         help='choose batch size for data loader, default value is 16')
     parser.add_argument('--shuffle', default=True, type=bool,
                         help='choose to shuffle data or not, default value is True')
-    parser.add_argument('--num_workers', default=2, type=int,
+    parser.add_argument('--num_workers', default=8, type=int,
                         help='how many workers to load for running dataset')
     parser.add_argument('--dataset_path', required=True, default='/data/synthtext', type=str,
                         help='path to synthtext dataset')
@@ -69,8 +69,10 @@ if __name__ == '__main__':
     SCH_STEP_SIZE = 3
     SCH_GAMMA = 0.1
     
+    
     MAX_EPOCHS = args.max_epoch
     NUM_GPUS = args.num_gpus
+    LOG_FREQ = args.log_freq 
 
     SAVED_CHECKPOINT_PATH = args.checkpoint_dir
     SAVED_LOGS_PATH = args.logs_dir
@@ -105,10 +107,10 @@ if __name__ == '__main__':
 
     # trailoader and validloader
     trainloader = loader.synthtext_trainloader(path=ROOT_PATH, batch_size=BSIZE,
-                                               shuffle=SHUFFLE, num_workers=NWORKERS)
+                                               shuffle=SHUFFLE, nworkers=NWORKERS)
 
     validloader = loader.synthtext_validloader(path=ROOT_PATH, batch_size=BSIZE,
-                                               shuffle=False, num_workers=NWORKERS)
+                                               shuffle=False, nworkers=NWORKERS)
     
     
     # Model Preparation
@@ -135,7 +137,7 @@ if __name__ == '__main__':
 
     
     # DEFAULTS used by the Trainer
-    model_checkpoint = pl.loggers.callbacks.ModelCheckpoint(
+    model_checkpoint = pl.callbacks.ModelCheckpoint(
         filepath=SAVED_CHECKPOINT_PATH,
         save_top_k=1,
         verbose=True,
@@ -147,7 +149,9 @@ if __name__ == '__main__':
 
     trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
                          logger=tensorboard_logger,
-                         checkpoint_callback=model_checkpoint)
+                         checkpoint_callback=model_checkpoint,
+                         log_every_n_steps=LOG_FREQ,
+                         num_sanity_val_steps=0)
 
     # start training the model
     trainer.fit(task, trainloader, validloader)
