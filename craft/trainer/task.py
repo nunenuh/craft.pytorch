@@ -10,6 +10,7 @@ from pytorch_lightning.metrics import Accuracy
 
 class TaskCRAFT(LightningModule):
     def __init__(self, model, criterion, optimizer, scheduler=None):
+        super(TaskCRAFT, self).__init__()
         self.model = model
         self.criterion = criterion
         self.optimizer = optimizer
@@ -37,6 +38,7 @@ class TaskCRAFT(LightningModule):
         loss = self.shared_step(batch, batch_idx)
         result = pl.TrainResult(loss)
         result.log_dict({'trn_loss': loss})
+        self.log('trn_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
         return result
 
@@ -44,6 +46,7 @@ class TaskCRAFT(LightningModule):
         loss = self.shared_step(batch, batch_idx)
         result = pl.EvalResult(checkpoint_on=loss)
         result.log_dict({'val_loss': loss})
+        self.log('val_loss', loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
 
         return result
 
