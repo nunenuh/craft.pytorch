@@ -141,9 +141,9 @@ if __name__ == '__main__':
         filepath=SAVED_CHECKPOINT_PATH,
         save_top_k=1,
         verbose=True,
-        monitor='checkpoint_on',
+        monitor='val_loss',
         mode='min',
-        prefix='flickr30k_net_'
+        prefix='craft_net_'
     )
     tensorboard_logger = pl.loggers.TensorBoardLogger(SAVED_LOGS_PATH)
 
