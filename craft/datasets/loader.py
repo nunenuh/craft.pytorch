@@ -25,7 +25,7 @@ def trainset_transform(resize_size=(224, 224), img_size=(224, 224), randrot_deg=
         # TC.RandomHue(),
         TC.ScaleRegionAffinity(scale=scale),
         TC.NumpyToTensor(),
-        TC.NormalizeWithScaler(mean=mean_norm, std=std_norm)
+        TC.Normalize(mean=mean_norm, std=std_norm)
     ])
 
     return transform
@@ -36,7 +36,7 @@ def validset_transform(resize_size=(224, 224), scale=0.5):
         TC.Resize(size=(224, 224)),
         TC.ScaleRegionAffinity(scale=0.5),
         TC.NumpyToTensor(),
-        TC.NormalizeWithScaler(mean=mean_norm, std=std_norm)
+        TC.Normalize(mean=mean_norm, std=std_norm)
     ])
 
     return transform
@@ -121,7 +121,7 @@ def synthtext_trainloader(path, batch_size=16, shuffle=True, nworkers=4,
                              gpad_factor=gpad_factor, aff_thresh=aff_thresh)
 
 
-def synthtext_valloader(path, batch_size=16, shuffle=True, nworkers=4,
+def synthtext_validloader(path, batch_size=16, shuffle=True, nworkers=4,
                         imsize=(224, 224), randrot=15, scale=0.5,
                         gksize=(35, 35), gdratio=2.0, guse_pad=False,
                         gpad_factor=0.1, aff_thresh=0.1):
