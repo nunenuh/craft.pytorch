@@ -92,12 +92,13 @@ if __name__ == '__main__':
     
     if args.resume:
         fpath = Path(args.resume)
+#         print(fpath.suffix)
         if fpath.is_file():
-            if fpath.suffix == 'ckpt':
+            if fpath.suffix == '.ckpt':
                 # it means checkpoint of pytorch lightning 
                 CHECKPOINT_RESUME = True
                 CHECKPOINT_PATH = str(fpath)
-            elif fpath.suffix == 'pth':
+            elif fpath.suffix == '.pth':
                 # it means pytorch file original from model
                 WEIGHT_RESUME = True
                 WEIGHT_PATH = str(fpath)       
@@ -129,6 +130,7 @@ if __name__ == '__main__':
     
     # Model Preparation
     if WEIGHT_RESUME:
+        print(f'Log:\tPretrain CRAFT model using weight from {WEIGHT_PATH}')
         model = CRAFT(pretrained=True)
         weights = torch.load(WEIGHT_PATH, map_location=torch.device('cpu'))
         weights = trainer_helper.copy_state_dict(weights)
@@ -142,13 +144,11 @@ if __name__ == '__main__':
     criterion = nnc.OHEMLoss()
     optimizer = optim.SGD(model.parameters(), lr=LRATE, weight_decay=WDECAY, momentum=MOMENTUM)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=SCH_STEP_SIZE, gamma=SCH_GAMMA)
+    task = TaskCRAFT(model, criterion, optimizer, scheduler)
+    
         
     
-    if CHECKPOINT_RESUME:
-        task = TaskCRAFT.load_from_checkpoint(CHECKPOINT_PATH)
-    else:
-        task = TaskCRAFT(model, criterion, optimizer, scheduler)
-
+    
     
     # DEFAULTS used by the Trainer
     model_checkpoint = pl.callbacks.ModelCheckpoint(
@@ -157,15 +157,24 @@ if __name__ == '__main__':
         verbose=True,
         monitor='val_loss',
         mode='min',
-        prefix='craft_net_'
+        prefix='craftnet'
     )
     tensorboard_logger = pl.loggers.TensorBoardLogger(SAVED_LOGS_PATH)
-
-    trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
-                         logger=tensorboard_logger,
-                         checkpoint_callback=model_checkpoint,
-                         log_every_n_steps=LOG_FREQ,
-                         num_sanity_val_steps=0)
+    
+    if CHECKPOINT_RESUME:
+        trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
+                             logger=tensorboard_logger,
+                             checkpoint_callback=model_checkpoint,
+                             log_every_n_steps=LOG_FREQ,
+                             num_sanity_val_steps=0,
+                            resume_from_checkpoint=CHECKPOINT_PATH)
+    else:
+        trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
+                             logger=tensorboard_logger,
+                             checkpoint_callback=model_checkpoint,
+                             log_every_n_steps=LOG_FREQ,
+                             num_sanity_val_steps=0)
+        
 
     # start training the model
     trainer.fit(task, trainloader, validloader)
