@@ -60,7 +60,11 @@ class GaussianGenerator(object):
 #             print(warped.shape)
             cropped = image[ymin:ymax, xmin:xmax]
             ch, cw = cropped.shape
+            if ch<=0: ch=1
+            if cw<=0: cw=1
             nsize = (cw, ch)
+            
+#             print(cropped.shape, warped.shape)
             warped = cv.resize(warped, nsize, interpolation=cv.INTER_AREA)
             image[ymin:ymax, xmin:xmax] = np.add(warped, cropped)
 
