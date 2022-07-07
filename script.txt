@@ -1,0 +1,2 @@
+python train.py --max_epoch 10 --dataset_path /data/SynthText --dataset_type synthtext --resume weights/craft_mlt_25k.pth
+
