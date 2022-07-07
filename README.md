@@ -11,7 +11,7 @@ This is a replication of CRAFT(Character-Region Awareness For Text Detection) wi
 To run this repository you need to install and activate the environment from yaml file using anaconda with this command:
 ```
 conda env create -f environment.yml
-conda activate clova
+conda activate craft
 ```
 
 ## Train The Network
