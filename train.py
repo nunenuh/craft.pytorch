@@ -152,26 +152,27 @@ if __name__ == '__main__':
     
     # DEFAULTS used by the Trainer
     model_checkpoint = pl.callbacks.ModelCheckpoint(
-        filepath=SAVED_CHECKPOINT_PATH,
+        dirpath=SAVED_CHECKPOINT_PATH,
+        filename='{epoch}-{val_loss:.2f}',
         save_top_k=1,
         verbose=True,
         monitor='val_loss',
         mode='min',
-        prefix='craftnet'
+        # prefix='craftnet'
     )
     tensorboard_logger = pl.loggers.TensorBoardLogger(SAVED_LOGS_PATH)
     
     if CHECKPOINT_RESUME:
         trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
                              logger=tensorboard_logger,
-                             checkpoint_callback=model_checkpoint,
+                             callbacks=[model_checkpoint],
                              log_every_n_steps=LOG_FREQ,
                              num_sanity_val_steps=0,
                             resume_from_checkpoint=CHECKPOINT_PATH)
     else:
         trainer = pl.Trainer(max_epochs=MAX_EPOCHS, gpus=NUM_GPUS,
                              logger=tensorboard_logger,
-                             checkpoint_callback=model_checkpoint,
+                             callbacks=[model_checkpoint],
                              log_every_n_steps=LOG_FREQ,
                              num_sanity_val_steps=0)
         
